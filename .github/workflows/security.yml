@@ -1,0 +1,95 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run security scans weekly
+    - cron: '0 0 * * 0'
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript', 'python' ]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
+    
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@1b1aada464948af03b950897e5eb522f92603cc2 # v3.24.9
+      with:
+        languages: ${{ matrix.language }}
+    
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@1b1aada464948af03b950897e5eb522f92603cc2 # v3.24.9
+    
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@1b1aada464948af03b950897e5eb522f92603cc2 # v3.24.9
+      with:
+        category: "/language:${{matrix.language}}"
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
+    
+    - name: Dependency Review
+      uses: actions/dependency-review-action@5a2ce3f5b92ee19cbb1541a4984c76d921601d7c # v4.3.4
+      with:
+        fail-on-severity: moderate
+
+  secret-scanning:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
+      with:
+        fetch-depth: 0
+    
+    - name: TruffleHog OSS
+      uses: trufflesecurity/trufflehog@dac3548f01f41bbbabc585aabfd861d95c88e12a # v3.82.13
+      with:
+        path: ./
+        base: ${{ github.event.repository.default_branch }}
+        head: HEAD
+        extra_args: --only-verified
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+      with:
+        node-version: '18'
+    
+    - name: Run npm audit
+      run: |
+        if [ -f "package.json" ]; then
+          npm audit --audit-level=moderate
+        else
+          echo "No package.json found, skipping npm audit"
+        fi
+      continue-on-error: true
