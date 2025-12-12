@@ -166,7 +166,7 @@ AIQuantumCharts-Master/
 
 ## Getting Help
 
-- **Documentation**: Check the [docs/](.) folder
+- **Documentation**: Check the docs/ folder
 - **Issues**: [Create an issue](https://github.com/rickfloyd/AIQuantumCharts-Master/issues)
 - **Discussions**: Use GitHub Discussions
 - **Security**: See [SECURITY.md](../SECURITY.md) for security concerns
