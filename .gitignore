@@ -23,6 +23,71 @@ hosting/.cache
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
 
-# Environment files (local configs)
-/.env.*
+# Environment files (local configs) - SECURITY CRITICAL
+.env
+.env.*
+!.env.example
+*.env
+*.env.*
+
+# API Keys and Secrets - SECURITY CRITICAL
+*secret*
+*token*
+*key*.pem
+*.key
+*.cert
+*.p12
+*.pfx
+credentials.json
+service-account.json
+
+# Dependency directories
+node_modules/
+jspm_packages/
+bower_components/
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+*.lcov
+.nyc_output
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.backup
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Database files
+*.sql
+*.sqlite
+*.sqlite3
+*.db
